@@ -7,13 +7,20 @@ module CustomError
 
   class ErrOperationNotDefine < Matrix_Error
     def message
-      message = "Operation is not define"
+      "Operation is not define!"
     end
   end
 
   class ErrDimensionMismatch < Matrix_Error
     def message
-      message = "Matrices dimensions mismatch"
+      "Matrices dimensions mismatch!"
     end
   end
+
+  class NoSquareMatrix < Matrix_Error
+    def message
+      "Matrix should be squared!"
+    end
+  end
+
 end

@@ -8,7 +8,9 @@ module Properties
     end
 
     def row_length
-      self.length
+      i = 0
+      self.each{ |row| i+=1 }
+      i/self[0].length
     end
 
     alias m row_length
@@ -23,6 +25,10 @@ module Properties
 
     def row(index)
       self[index]
+    end
+
+    def row_change(index, elements)
+      self[index] = elements
     end
 
     def col(index)
