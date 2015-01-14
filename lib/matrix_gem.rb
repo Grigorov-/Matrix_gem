@@ -7,11 +7,16 @@ require './matrix_gem/properties_module'
     include Properties
     include Enumerable
 
+    #---------Initialize the matrix------
+    #  1. Matrix with values
+    #     Matrix.new(rows, cols, numbers) // numbers = rows*cols
+    #  2. Matrix only with dimention(rows and cols) make Identity matrix
+    #     Matrix.new(rows, cols)
     def initialize(rows, cols, *nums)
       if rows < 1 || cols < 1
         raise MatrixArgumentError, "Rows and Columns should be positive numbers!"
       elsif nums.length == 0
-        @matrix = identity cols
+        x = identity cols
       elsif rows * cols == nums.length
         @matrix = matrix_with_values nums, cols
       else
@@ -21,6 +26,7 @@ require './matrix_gem/properties_module'
       @matrix
     end
 
+    #Return the sum of two matrices in new matrix
     def +(matrix)
       sum_validation(matrix, self)
       values = self.zip(matrix).map{|i| i.inject(:+)}
@@ -28,6 +34,7 @@ require './matrix_gem/properties_module'
       Matrix.new self.m, self.n, *(values)
     end
 
+    #Return the difference of two matrices in new matrix
     def -(matrix)
       sum_validation(matrix, self)
       values = self.zip(matrix).map{|i| i.inject(:-)}
@@ -35,6 +42,8 @@ require './matrix_gem/properties_module'
       Matrix.new self.m, self.n, *(values)
     end
 
+    # Returns element (i,j) of the matrix. That is: row i, column j.
+    # If only i is given return row[i]. That is: row with index i.
     def [](i, j = nil)
       if j == nil
         @matrix[i]
@@ -43,24 +52,36 @@ require './matrix_gem/properties_module'
       end
     end
 
+    # Set element (i,j) of the matrix. That is: row i, column j.
+    # Set row i of the matrix if j is not given. That is: column j.
+    # Also aliased as set_element
     def []=(i, j = nil, val)
-      @matrix[i] = val if j == nil
-      @matrix[i][j] = val if j != nil
+      if j == nil
+        raise ErrDimensionMismatch if val.length != self.m
+        @matrix[i] = val
+      else
+        @matrix[i][j] = val
+      end
     end
     alias set_element []=
 
+    # Return a new matrix which is the transposition of the given one.
     def transposed
       elements = []
       @matrix.to_a.transpose.map{ |x| x.map{ |y| elements << y } }
       Matrix.new self.m, self.n, *(elements)
     end
 
+    # Transpose the matrix.
+    # Also aliased as t().
     def transpose
       elements = []
       @matrix.to_a.transpose.map{ |x| x.map{ |y| elements << y } }
       @matrix = elements.each_slice(@matrix[0].length).to_a
     end
+    alias t transpose
 
+    #Each method.
     def each
       @matrix.each  do |sub_arr|
         sub_arr.each do |value|
@@ -69,10 +90,12 @@ require './matrix_gem/properties_module'
       end
     end
 
+    # Returns true if and only if the two matrices contain equal elements.
     def ==(matrix)
       matrix.to_a == self.to_a
     end
 
+    # Matrix multiplication.
     def *(m)
       case(m)
       when Numeric
@@ -91,6 +114,8 @@ require './matrix_gem/properties_module'
       end
     end
 
+    # Returns the determinant of the matrix.
+    # Also alised as determinant()
     def det
       is_square_validation self
 
@@ -127,14 +152,17 @@ require './matrix_gem/properties_module'
       det *= c
       det.round
     end
+    alias determinant det
 
+    # Multiplication of matrix row with number.
     def multiply_row(matrix, index, number)
       matrix = matrix.row(index).map{ |n| n*number }
     end
 
+    # Returns the inverse of the matrix.
     def inverse
       is_square_validation self
-      raise Error if self.det == 0
+      raise ErrZeroDeterminant if self.det == 0
 
       _this = copy(self)
       c = 1
@@ -152,67 +180,78 @@ require './matrix_gem/properties_module'
               end
             end
           end
-          return 0 if _this[i, i] == 0
-          cauchy_method(e, i, j, -_this[j, i]/_this[i, i])
 
-          p "_________"
-          cauchy_method(_this, i, j, -_this[j, i]/_this[i, i])
-          p _this
+          return 0 if _this[i, i] == 0
+
+          cauchy_method(e, i, j, -_this[j, i]/_this[i, i].to_f)
+          cauchy_method(_this, i, j, -_this[j, i]/_this[i, i].to_f)
         end
       end
-
-      p '||||||||||||||||||||||||||'
 
       (0..size-2).each do |i|
         (i+1..size-1).each do |j|
+
           cauchy_method(e, size-i-1, size-j-1, -_this[size-j-1, size-i-1]/_this[size-i-1, size-i-1])
+
           cauchy_method(_this, size-i-1, size-j-1, -_this[size-j-1, size-i-1]/_this[size-i-1, size-i-1])
         end
-        p _this
       end
-
-      p '|||||||||||||||||||||||||||||||||||||||'
 
       (0..size-1).each do |i|
         e.row_change i, multiply_row(e, i, 1/_this[i,i])
         _this.row_change i, multiply_row(_this, i, 1/_this[i,i])
       end
-      p _this
       e
+    end
+
+    # Chanege matrix to its inversed.
+    def inversed
+      elements = []
+      self.inverse.each{ |x| elements << x}
+      @matrix = elements.each_slice(@matrix[0].length).to_a
     end
 
     private
 
+    # Swap to matrix rows.
     def swap_rows(_this, row1_index, row2_index)
       _this[row1_index], _this[row2_index] = _this[row2_index], _this[row1_index]
     end
 
+    # Return new instance of Matrix with same values.
     def copy(_this)
       values = []
-      _this.each{ |row| values << row}
+      _this.each{ |row| values << row }
       copy = Matrix.new _this.m, _this.n, *(values)
     end
 
-    def cauchy_method(_this, row1, row2, multiplier)
-      _this.row(row2).each_with_index { |row_element, i|
-        _this.row(row2)[i] += _this[row1][i] * multiplier
-      }
+    # Multiply the first row elements with multiplier and sum it with second row
+    # elements.
+    # Used to make matrix in triangular form.
+    def cauchy_method(_this, row1_index, row2_index, multiplier)
+      _this.row(row2_index).each_with_index do |row_element, i|
+        _this.row(row2_index)[i] += _this[row1_index][i] * multiplier
+      end
       _this
     end
 
+    # Check if caller matrix columns are equal to other matrix rows.
     def multiply_validation(_this, matrix)
       raise ErrDimensionMismatch if _this.n != matrix.m
     end
 
+    # Check if matrix rows are equals to its columns.
     def is_square_validation(_this)
       raise NoSquareMatrix if _this.m != _this.n
     end
 
+    # Check if matrices have same dimentions.
     def sum_validation(_this, matrix)
       raise ErrOperationNotDefine if matrix.is_a? Numeric
       raise ErrDimensionMismatch if matrix.m != _this.m || matrix.n != _this.n
     end
 
+    # Make Identity matrix.
     def identity(dimension)
       id_matrix = []
       dimension.times do |x|
@@ -228,6 +267,7 @@ require './matrix_gem/properties_module'
       return id_matrix
     end
 
+    # Format values.
     def matrix_with_values(values, col_length)
       matrixNums = values.each_slice(col_length).to_a
     end
@@ -236,15 +276,17 @@ require './matrix_gem/properties_module'
 
 a = Matrix.new 3,3,1,2,57,1,3,43,5,6,7
 # p a
-c = Matrix.new 2,2,7,9,5,2
+c = Matrix.new 2,2,4,3,3,2
 d = Matrix.new 3,3,2,3,1,1,2,1,3,5,3
 # d = Matrix.new 2,2,0,1,3,0
 # d = Matrix.new 2,2,0,9,5,2
 
 
-# d = Matrix.new
+# d = Matrix.new 3,3,0,3,1,1,0,2,2,3,4
+# p d
 
-p d.inverse
+p c
+
 
 
 

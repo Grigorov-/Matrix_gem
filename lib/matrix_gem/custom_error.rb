@@ -23,4 +23,12 @@ module CustomError
     end
   end
 
+  class ErrZeroDeterminant < Matrix_Error
+    def message
+      "Matrix determinant should be not equal to zero!"
+    end
+  end
+
+
+
 end
