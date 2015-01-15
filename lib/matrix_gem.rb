@@ -1,22 +1,26 @@
-require './matrix_gem/custom_error'
+require './matrix_gem/matrix_err'
 require './matrix_gem/properties_module'
 
 
   class Matrix
-    include CustomError
+    include MatrixErr
     include Properties
     include Enumerable
+
 
     #---------Initialize the matrix------
     #  1. Matrix with values
     #     Matrix.new(rows, cols, numbers) // numbers = rows*cols
-    #  2. Matrix only with dimention(rows and cols) make Identity matrix
+    #  2. Matrix only with dimension(rows and cols) make Identity matrix with dimension
+    #     equal to rows
     #     Matrix.new(rows, cols)
     def initialize(rows, cols, *nums)
       if rows < 1 || cols < 1
         raise MatrixArgumentError, "Rows and Columns should be positive numbers!"
+      elsif ((cols.is_a? Float) || (rows.is_a? Float))
+        raise MatrixArgumentError, "Dimension of matrix can't be floating point number"
       elsif nums.length == 0
-        x = identity cols
+        @matrix = identity rows
       elsif rows * cols == nums.length
         @matrix = matrix_with_values nums, cols
       else
@@ -26,7 +30,19 @@ require './matrix_gem/properties_module'
       @matrix
     end
 
-    #Return the sum of two matrices in new matrix
+    # Creates a matrix where the diagonal elements are composed of values.
+    def self.diagonal(*nums)
+      size = nums.size
+      matrix = Matrix.new size, size
+
+      size.times do |x|
+        matrix[x][x] = nums[x]
+      end
+      matrix
+    end
+
+    # Return the sum of two matrices in new matrix
+    # Raises an error if matrices dimension mismatch.
     def +(matrix)
       sum_validation(matrix, self)
       values = self.zip(matrix).map{|i| i.inject(:+)}
@@ -34,7 +50,8 @@ require './matrix_gem/properties_module'
       Matrix.new self.m, self.n, *(values)
     end
 
-    #Return the difference of two matrices in new matrix
+    # Return the difference of two matrices in new matrix.
+    # Raises an error if matrices dimension mismatch.
     def -(matrix)
       sum_validation(matrix, self)
       values = self.zip(matrix).map{|i| i.inject(:-)}
@@ -92,22 +109,22 @@ require './matrix_gem/properties_module'
 
     # Returns true if and only if the two matrices contain equal elements.
     def ==(matrix)
-      matrix.to_a == self.to_a
+      matrix.to_f.to_a == self.to_f.to_a
     end
 
     # Matrix multiplication.
-    def *(m)
-      case(m)
+    def *(matrix)
+      case(matrix)
       when Numeric
         new_matrix_values = []
-        self.each { |x| new_matrix_values << x * m }
+        self.each { |x| new_matrix_values << x * matrix }
         Matrix.new self.m, self.n, *(new_matrix_values)
       when Matrix
-        multiply_validation self, m
+        multiply_validation self, matrix
         rows = Array.new(self.m) { |i|
-          Array.new(m.n) { |j|
-            (0 ... m.n ).inject(0)  do |vij, k|
-              vij + self[i, k] * m[k, j]
+          Array.new(matrix.n) { |j|
+            (0 ... matrix.n ).inject(0)  do |vij, k|
+              vij + self[i, k] * matrix[k, j]
             end
           }
         }
@@ -159,8 +176,8 @@ require './matrix_gem/properties_module'
       matrix = matrix.row(index).map{ |n| n*number }
     end
 
-    # Returns the inverse of the matrix.
-    def inverse
+    # Chanege matrix to its inversed.
+    def inversed
       is_square_validation self
       raise ErrZeroDeterminant if self.det == 0
 
@@ -204,12 +221,19 @@ require './matrix_gem/properties_module'
       e
     end
 
-    # Chanege matrix to its inversed.
-    def inversed
+    # Returns the inverse of the matrix.
+    def inverse
       elements = []
       self.inverse.each{ |x| elements << x}
       @matrix = elements.each_slice(@matrix[0].length).to_a
     end
+
+    # TODO
+    # def to_s
+    #   "Matrix[" + self.map{|row|
+    #   "[" + row.map{|e| e.to_s}.join("\t") + "]"
+    #   }.join(", ") + "]"
+    # end
 
     private
 
@@ -245,7 +269,7 @@ require './matrix_gem/properties_module'
       raise NoSquareMatrix if _this.m != _this.n
     end
 
-    # Check if matrices have same dimentions.
+    # Check if matrices have same dimensions.
     def sum_validation(_this, matrix)
       raise ErrOperationNotDefine if matrix.is_a? Numeric
       raise ErrDimensionMismatch if matrix.m != _this.m || matrix.n != _this.n
@@ -273,19 +297,86 @@ require './matrix_gem/properties_module'
     end
   end
 
+  class Diagonal_Matrix < Matrix
 
-a = Matrix.new 3,3,1,2,57,1,3,43,5,6,7
+    # Creates a matrix where the diagonal elements are composed of nums.
+    # With given only rows create identity matrix.
+    def initialize(rows, cols = nil, *nums)
+      if cols == nil
+        @matrix = identity rows
+      elsif nums.length < [rows, cols].min
+        raise MatrixArgumentError,
+        "Wrong number of arguments (#{2 + nums.length} for #{2 + [rows, cols].min})"
+      else
+        @matrix = []
+        rows.times do |row|
+          @matrix[row] = []
+          cols.times do |col|
+            if row == col
+              @matrix[row][col] = nums[row]
+            else
+              @matrix[row][col] = 0
+            end
+          end
+        end
+      end
+    end
+
+    # Set element on main diagonal
+    def []=(row_index, col_index = nil, value)
+      if col_index != nil && row_index != col_index
+        raise MatrixIndexOutOfRange,
+        "You can set only elements on main diagonal in a diagonal matrix."
+      elsif @matrix.size <= row_index
+        raise MatrixIndexOutOfRange
+      end
+        @matrix[row_index][row_index] = value
+    end
+  end
+
+  class Ortogonal_Matrix < Matrix
+
+    # Initialize ortogonal matrix (square matrix and its transpose is equal to its inverse).
+    def initialize(rows, cols, *nums)
+      if !(Matrix.new rows, cols, *(nums)).ortogonal?
+        raise MatrixArgumentError,
+        "Can't initialize ortogonal matrix with this values."
+      elsif nums.length == 0
+          @matrix = identity rows
+      else
+        @matrix = matrix_with_values nums, cols
+      end
+    end
+
+    # Set element on main diagon
+    def []=(i, j, value)
+      b = copy(self)
+      b[i,j] = value
+      if b.ortogonal?
+        @matrix[i][j] = value
+      else
+        raise MatrixInvalidValue, 'The matrix must be ortogonal.'
+      end
+    end
+  end
+
+
+# a = Matrix.new 3,3,1,2,57,1,3,43,5,6,70
 # p a
-c = Matrix.new 2,2,4,3,3,2
-d = Matrix.new 3,3,2,3,1,1,2,1,3,5,3
-# d = Matrix.new 2,2,0,1,3,0
+# c = Matrix.new 2,3,1,2,3,1,2,3
+# p c
+# d = Matrix.new 2,2
+# p d.to_f
+
+
+d = Ortogonal_Matrix.new 2,2,1,0,0,1
+d[1,1] = -1
+p d
 # d = Matrix.new 2,2,0,9,5,2
 
 
-# d = Matrix.new 3,3,0,3,1,1,0,2,2,3,4
-# p d
 
-p c
+
 
 
 
