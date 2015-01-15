@@ -228,13 +228,6 @@ require './matrix_gem/properties_module'
       @matrix = elements.each_slice(@matrix[0].length).to_a
     end
 
-    # TODO
-    # def to_s
-    #   "Matrix[" + self.map{|row|
-    #   "[" + row.map{|e| e.to_s}.join("\t") + "]"
-    #   }.join(", ") + "]"
-    # end
-
     private
 
     # Swap to matrix rows.
@@ -360,7 +353,6 @@ require './matrix_gem/properties_module'
     end
   end
 
-
 # a = Matrix.new 3,3,1,2,57,1,3,43,5,6,70
 # p a
 # c = Matrix.new 2,3,1,2,3,1,2,3
@@ -368,10 +360,8 @@ require './matrix_gem/properties_module'
 # d = Matrix.new 2,2
 # p d.to_f
 
-
 d = Ortogonal_Matrix.new 2,2,1,0,0,1
-d[1,1] = -1
-p d
+
 # d = Matrix.new 2,2,0,9,5,2
 
 

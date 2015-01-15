@@ -5,12 +5,19 @@ module Properties
   end
 
   # Make all values floating point.
-    def to_f
-      (0..self.n - 1).each{ |i| (0..self.m - 1).each do
-        |j| self[i,j] = self[i,j].to_f
-        end }
-      self
-    end
+  def to_f
+    (0..self.n - 1).each{ |i| (0..self.m - 1).each do
+      |j| self[i,j] = self[i,j].to_f
+      end }
+    self
+  end
+
+  # To stirng method.
+  def to_str
+    "Matrix\n[" + @matrix.map{|row|
+    "[" + row.map{|e| e.to_s}.join(" ") + "]"
+    }.join(",\n") + "]"
+  end
 
   # Returns the number of columns.
   # Also aliased as n(), col_size(), column_count()
