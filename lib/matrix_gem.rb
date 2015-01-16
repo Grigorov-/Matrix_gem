@@ -1,14 +1,16 @@
-require './matrix_gem/matrix_err'
-require './matrix_gem/properties_module'
 
+require_relative 'matrix_gem/matrix_err'
+require_relative 'matrix_gem/properties_module'
 
   class Matrix
+
     include MatrixErr
     include Properties
     include Enumerable
 
 
-    #---------Initialize the matrix------
+
+    #---------Initialize the matrix--------
     #  1. Matrix with values
     #     Matrix.new(rows, cols, numbers) // numbers = rows*cols
     #  2. Matrix only with dimension(rows and cols) make Identity matrix with dimension
@@ -30,6 +32,15 @@ require './matrix_gem/properties_module'
       @matrix
     end
 
+# TODO
+# build make matrix that have zeros where don't have given values.
+
+    # Creates an n by n zero matrix.
+    def self.zero(n)
+      values = Array.new(n*n, 0)
+      matrix = Matrix.new n, n, *(values)
+    end
+
     # Creates a matrix where the diagonal elements are composed of values.
     def self.diagonal(*nums)
       size = nums.size
@@ -39,6 +50,11 @@ require './matrix_gem/properties_module'
         matrix[x][x] = nums[x]
       end
       matrix
+    end
+
+    # Creates an n by n identity matrix.
+    def self.identity(n)
+      Matrix.new n, n
     end
 
     # Return the sum of two matrices in new matrix
@@ -57,6 +73,30 @@ require './matrix_gem/properties_module'
       values = self.zip(matrix).map{|i| i.inject(:-)}
 
       Matrix.new self.m, self.n, *(values)
+    end
+
+    # Matrix multiplication.
+    def *(matrix)
+      case(matrix)
+      when Numeric
+        new_matrix_values = []
+        self.each { |x| new_matrix_values << x * matrix }
+        Matrix.new self.m, self.n, *(new_matrix_values)
+      when Matrix
+        multiply_validation self, matrix
+        rows = Array.new(self.m) { |i|
+          Array.new(matrix.n) { |j|
+            (0 ... matrix.n ).inject(0)  do |vij, k|
+              vij + self[i, k] * matrix[k, j]
+            end
+          }
+        }
+      end
+    end
+
+    # Matrix division (multiplication by the inverse).
+    def /(matrix)
+      self * matrix.inversed
     end
 
     # Returns element (i,j) of the matrix. That is: row i, column j.
@@ -112,25 +152,6 @@ require './matrix_gem/properties_module'
       matrix.to_f.to_a == self.to_f.to_a
     end
 
-    # Matrix multiplication.
-    def *(matrix)
-      case(matrix)
-      when Numeric
-        new_matrix_values = []
-        self.each { |x| new_matrix_values << x * matrix }
-        Matrix.new self.m, self.n, *(new_matrix_values)
-      when Matrix
-        multiply_validation self, matrix
-        rows = Array.new(self.m) { |i|
-          Array.new(matrix.n) { |j|
-            (0 ... matrix.n ).inject(0)  do |vij, k|
-              vij + self[i, k] * matrix[k, j]
-            end
-          }
-        }
-      end
-    end
-
     # Returns the determinant of the matrix.
     # Also alised as determinant()
     def det
@@ -152,7 +173,6 @@ require './matrix_gem/properties_module'
             end
           end
           if _this[i,i] == 0
-            p _this
             return 0
           end
 
@@ -288,79 +308,18 @@ require './matrix_gem/properties_module'
     def matrix_with_values(values, col_length)
       matrixNums = values.each_slice(col_length).to_a
     end
+
   end
-
-  class Diagonal_Matrix < Matrix
-
-    # Creates a matrix where the diagonal elements are composed of nums.
-    # With given only rows create identity matrix.
-    def initialize(rows, cols = nil, *nums)
-      if cols == nil
-        @matrix = identity rows
-      elsif nums.length < [rows, cols].min
-        raise MatrixArgumentError,
-        "Wrong number of arguments (#{2 + nums.length} for #{2 + [rows, cols].min})"
-      else
-        @matrix = []
-        rows.times do |row|
-          @matrix[row] = []
-          cols.times do |col|
-            if row == col
-              @matrix[row][col] = nums[row]
-            else
-              @matrix[row][col] = 0
-            end
-          end
-        end
-      end
-    end
-
-    # Set element on main diagonal
-    def []=(row_index, col_index = nil, value)
-      if col_index != nil && row_index != col_index
-        raise MatrixIndexOutOfRange,
-        "You can set only elements on main diagonal in a diagonal matrix."
-      elsif @matrix.size <= row_index
-        raise MatrixIndexOutOfRange
-      end
-        @matrix[row_index][row_index] = value
-    end
-  end
-
-  class Ortogonal_Matrix < Matrix
-
-    # Initialize ortogonal matrix (square matrix and its transpose is equal to its inverse).
-    def initialize(rows, cols, *nums)
-      if !(Matrix.new rows, cols, *(nums)).ortogonal?
-        raise MatrixArgumentError,
-        "Can't initialize ortogonal matrix with this values."
-      elsif nums.length == 0
-          @matrix = identity rows
-      else
-        @matrix = matrix_with_values nums, cols
-      end
-    end
-
-    # Set element on main diagon
-    def []=(i, j, value)
-      b = copy(self)
-      b[i,j] = value
-      if b.ortogonal?
-        @matrix[i][j] = value
-      else
-        raise MatrixInvalidValue, 'The matrix must be ortogonal.'
-      end
-    end
-  end
-
+require_relative 'matrix_gem/diagonal_matrix'
+require_relative 'matrix_gem/orthogonal_matrix'
 # a = Matrix.new 3,3,1,2,57,1,3,43,5,6,70
 # p a
 # c = Matrix.new 2,3,1,2,3,1,2,3
 # p c
-# d = Matrix.new 2,2
-# p d.to_f
+# p d
 
-d = Ortogonal_Matrix.new 2,2,1,0,0,1
+# d = Matrix.new 3,3,1,2,3,3,2,1,2,1,3
+# p d
 
 # d = Matrix.new 2,2,0,9,5,2
 

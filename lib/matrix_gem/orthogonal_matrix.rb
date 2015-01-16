@@ -1,0 +1,28 @@
+require_relative  '../matrix_gem'
+
+  class Orthogonal_Matrix < Matrix
+
+  # Initialize orthogonal matrix (square matrix and its transpose is equal to its inverse).
+    def initialize(rows, cols, *nums)
+      if !(Matrix.new rows, cols, *(nums)).ortogonal?
+        raise MatrixArgumentError,
+        "Can't initialize orthogonal matrix with this values."
+      elsif nums.length == 0
+          @matrix = identity rows
+      else
+        @matrix = matrix_with_values nums, cols
+      end
+    end
+
+    # Set element.
+    # Raise error if the matrix with new value is not orthogonal.
+    def []=(i, j, value)
+      b = copy(self)
+      b[i,j] = value
+      if b.ortogonal?
+        @matrix[i][j] = value
+      else
+        raise MatrixInvalidValue, 'The matrix must be orthogonal.'
+      end
+    end
+  end

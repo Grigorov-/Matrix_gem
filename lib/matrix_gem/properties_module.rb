@@ -14,9 +14,9 @@ module Properties
 
   # To stirng method.
   def to_str
-    "Matrix\n[" + @matrix.map{|row|
+    "Matrix\n" + @matrix.map{|row|
     "[" + row.map{|e| e.to_s}.join(" ") + "]"
-    }.join(",\n") + "]"
+    }.join(",\n")
   end
 
   # Returns the number of columns.
@@ -52,7 +52,7 @@ module Properties
     self[index] = elements
   end
 
-  # Return col on index
+  # Return column on index.
   # Also aliased as column()
   def col(index)
     self.each { |a| p a[index] }
