@@ -2,9 +2,8 @@ require_relative  '../matrix_gem'
 
   class Diagonal_Matrix < Matrix
 
-    # Creates a matrix where the diagonal elements are composed of nums.
+    # Creates a matrix by given rows, columns, and nums where the diagonal elements are composed of nums.
     # With given only rows create identity matrix.
-    # If the matrix is non square create it with dimention equal to min of rows and cols.
     def initialize(rows, cols = nil, *nums)
       if cols == nil
         @matrix = identity rows
@@ -26,6 +25,7 @@ require_relative  '../matrix_gem'
       end
     end
 
+    # Creates a matrix where the diagonal elements are composed of nums.
     def self.diagonal(*nums)
       size = nums.length
       Diagonal_Matrix.new size, size, *(nums)

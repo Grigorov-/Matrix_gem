@@ -1,4 +1,8 @@
 module Properties
+  require_relative 'matrix_err.rb'
+
+  include MatrixErr
+
   # Returns an array of arrays that describe the rows of the matrix.
   def to_a
     self
@@ -12,11 +16,15 @@ module Properties
     self
   end
 
-  # To stirng method.
-  def to_str
-    "Matrix\n" + @matrix.map{|row|
-    "[" + row.map{|e| e.to_s}.join(" ") + "]"
-    }.join(",\n")
+  # Return array with values on main diagonal.
+  def diagonal_values
+    size = ([self.m, self.n].min) -1
+    values = []
+
+    (0..size).each do |i|
+      values << self[i][i]
+    end
+    values
   end
 
   # Returns the number of columns.
@@ -42,27 +50,40 @@ module Properties
   alias col_size col_length
   alias column_count n
 
-  # Retun row on index.
+  # Retuns array with row on index as values.
   def row(index)
     self[index]
   end
 
-  # Set value of matrix row.
-  def row_change(index, elements)
-    self[index] = elements
-  end
-
-  # Return column on index.
+  # Returns array with column on index as values.
   # Also aliased as column()
   def col(index)
-    self.each { |a| p a[index] }
+    column = []
+    (0..self.m-1).each{ |x| column << self[x, index] }
+    column
   end
   alias column col
 
-  # Returns true is this is a diagonal matrix. Raises an error if matrix is not square.
+  # Set values of matrix row. Elements shoud be an array of values
+  # Raise error if length of elements is not equal to matrix row length.
+  def set_row(index, elements)
+    raise MatrixArgumentError, 'Different length of elements and row length' if elements.length != self.row_length
+    self[index] = elements
+    self
+  end
+
+  #TODO ? set_col(index, elments, *nums)
+  # Set values of matrix column. Elements shoud be an array of values.
+  # Raise error if length of elements is not equal to matrix column length.
+  def set_col(index, elements)
+    raise MatrixArgumentError, 'Different length of elements and column length' if elements.length != self.col_length
+    (0..self.m-1).each{ |x| self[x, index] = elements[x] }
+    self
+  end
+
+  # Returns true if there is values not equal to 0 only on main diagonal.
   # Also aliased as diagonal?
   def is_diagonal
-    raise NoSquareMatrix if self.m != self.n
     (0..self.m-1).each do |i|
       (0..self.m-1).each do |j|
         return false if ((self[i,j] != 0 && i != j))
@@ -90,9 +111,10 @@ module Properties
 
   # Returns true if this is square matrix and its transpose is equal to its inverse.
   # Also aliased as is_zero
-  def ortogonal?
+  def orthogonal?
     return true if ((self.is_square) && (self.transposed == self.inversed))
     false
   end
-  alias is_ortogonal ortogonal?
+  alias is_orthogonal orthogonal?
+
 end

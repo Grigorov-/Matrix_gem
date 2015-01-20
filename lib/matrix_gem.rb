@@ -1,14 +1,10 @@
-
 require_relative 'matrix_gem/matrix_err'
 require_relative 'matrix_gem/properties_module'
 
   class Matrix
-
     include MatrixErr
     include Properties
     include Enumerable
-
-
 
     #---------Initialize the matrix--------
     #  1. Matrix with values
@@ -31,9 +27,6 @@ require_relative 'matrix_gem/properties_module'
       end
       @matrix
     end
-
-# TODO
-# build make matrix that have zeros where don't have given values.
 
     # Creates an n by n zero matrix.
     def self.zero(n)
@@ -91,12 +84,22 @@ require_relative 'matrix_gem/properties_module'
             end
           }
         }
+        values = []
+        rows.each{ |x| x.each { |y| values << y} }
+        Matrix.new self.m, matrix.n, *(values)
       end
     end
 
     # Matrix division (multiplication by the inverse).
     def /(matrix)
-      self * matrix.inversed
+      case matrix
+      when Numeric
+        new_matrix_values = []
+        self.each { |x| new_matrix_values << x / matrix.to_f }
+        Matrix.new self.m, self.n, *(new_matrix_values)
+      when Matrix
+        self * matrix.inversed
+      end
     end
 
     # Returns element (i,j) of the matrix. That is: row i, column j.
@@ -116,7 +119,7 @@ require_relative 'matrix_gem/properties_module'
       if j == nil
         raise ErrDimensionMismatch if val.length != self.m
         @matrix[i] = val
-      else
+      elsif (i < self.m && j < self.n)
         @matrix[i][j] = val
       end
     end
@@ -135,12 +138,13 @@ require_relative 'matrix_gem/properties_module'
       elements = []
       @matrix.to_a.transpose.map{ |x| x.map{ |y| elements << y } }
       @matrix = elements.each_slice(@matrix[0].length).to_a
+      self
     end
     alias t transpose
 
     #Each method.
     def each
-      @matrix.each  do |sub_arr|
+      @matrix.each do |sub_arr|
         sub_arr.each do |value|
           yield value
         end
@@ -149,6 +153,7 @@ require_relative 'matrix_gem/properties_module'
 
     # Returns true if and only if the two matrices contain equal elements.
     def ==(matrix)
+      raise ErrDimensionMismatch if (self.m != matrix.m || self.n != matrix.n)
       matrix.to_f.to_a == self.to_f.to_a
     end
 
@@ -196,7 +201,7 @@ require_relative 'matrix_gem/properties_module'
       matrix = matrix.row(index).map{ |n| n*number }
     end
 
-    # Chanege matrix to its inversed.
+    # Returns new matrix witch is the inverse of the matrix.
     def inversed
       is_square_validation self
       raise ErrZeroDeterminant if self.det == 0
@@ -235,17 +240,28 @@ require_relative 'matrix_gem/properties_module'
       end
 
       (0..size-1).each do |i|
-        e.row_change i, multiply_row(e, i, 1/_this[i,i])
-        _this.row_change i, multiply_row(_this, i, 1/_this[i,i])
+        e.set_row i, multiply_row(e, i, 1/_this[i,i])
+        _this.set_row i, multiply_row(_this, i, 1/_this[i,i])
       end
-      e
-    end
+        Matrix.new self.m, self.m, *(e)
+      end
 
-    # Returns the inverse of the matrix.
+    # Chanege matrix to its inversed.
     def inverse
       elements = []
-      self.inverse.each{ |x| elements << x}
+      self.inversed.each{ |x| elements << x}
       @matrix = elements.each_slice(@matrix[0].length).to_a
+      self
+    end
+
+    # To stirng method.
+    def to_str
+      a = "Matrix\n" + @matrix.map do |row|
+        "[" + row.map do |e|
+           e.to_s
+        end.join(" ") + "]"
+      end.join(",\n")
+      puts a
     end
 
     private
@@ -274,7 +290,7 @@ require_relative 'matrix_gem/properties_module'
 
     # Check if caller matrix columns are equal to other matrix rows.
     def multiply_validation(_this, matrix)
-      raise ErrDimensionMismatch if _this.n != matrix.m
+      raise ErrDimensionMismatch if _this.col_size != matrix.row_size
     end
 
     # Check if matrix rows are equals to its columns.
@@ -312,16 +328,40 @@ require_relative 'matrix_gem/properties_module'
   end
 require_relative 'matrix_gem/diagonal_matrix'
 require_relative 'matrix_gem/orthogonal_matrix'
-# a = Matrix.new 3,3,1,2,57,1,3,43,5,6,70
-# p a
-# c = Matrix.new 2,3,1,2,3,1,2,3
-# p c
-# p d
 
-# d = Matrix.new 3,3,1,2,3,3,2,1,2,1,3
-# p d
+    # square_matrix = Matrix.new 3,3,1,2,57,1,3,4,5,6,70
+    # a = Matrix.new 2,3,1,2,3,6,5,4
+    # # p a.column(2)
+    # # p square_matrix.column(0)
+    # square_matrix.set_col 1, [200,300,100]
+    # p square_matrix
 
-# d = Matrix.new 2,2,0,9,5,2
+
+
+# p d
+   # a = Matrix.new 3,2,1,2,3,3,2,3
+    b = Matrix.new 2,2,1,1,2,1
+    # b[1,1] = 555
+    # p b
+
+   #  p a/b
+   #  diff = Matrix.new 3,2,3,-1,3,0,4,-1
+   #  scalar_diff = Matrix.new 2,2,0.5,0.5,1,0.5
+    # non_square_matrix = Matrix.new 3,2,1,2,3,3,2,3
+    # non_square_matrix.to_str
+    # c.to_str
+    # p c.inverse
+
+# d = Matrix.new 3,2,1,2,3,3,2,3
+
+# da = a - d
+# p da
+
+# p d.diagonal_values
+# p c == d
+
+
+
 
 
 
