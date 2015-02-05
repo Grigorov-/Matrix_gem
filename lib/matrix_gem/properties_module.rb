@@ -27,6 +27,20 @@ module Properties
     values
   end
 
+  # TODO Test it!!
+  # Set values on main diagonal.
+  # Raise error if nums are less than matrix main diagonal length
+  # Also aliased as set_diagonal_values
+  def set_diagonal(*nums)
+    size = ([self.m, self.n].min) -1
+    raise MatrixArgumentError, 'Wrong number of arguments.' if nums.length < size + 1
+    (0..size).each do |i|
+      self[i,i] = nums[i]
+    end
+    self
+  end
+  alias set_diagonal_values set_diagonal
+
   # Returns the number of columns.
   # Also aliased as n(), col_size(), column_count()
   def col_length
@@ -67,12 +81,12 @@ module Properties
   # Set values of matrix row. Elements shoud be an array of values
   # Raise error if length of elements is not equal to matrix row length.
   def set_row(index, elements)
-    raise MatrixArgumentError, 'Different length of elements and row length' if elements.length != self.row_length
+    raise MatrixArgumentError, 'Different length of elements and row length' if
+    elements.length != self.row_length
     self[index] = elements
     self
   end
 
-  #TODO ? set_col(index, elments, *nums)
   # Set values of matrix column. Elements shoud be an array of values.
   # Raise error if length of elements is not equal to matrix column length.
   def set_col(index, elements)
@@ -116,5 +130,4 @@ module Properties
     false
   end
   alias is_orthogonal orthogonal?
-
 end

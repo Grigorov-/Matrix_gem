@@ -53,8 +53,8 @@ require_relative 'matrix_gem/properties_module'
     # Return the sum of two matrices in new matrix
     # Raises an error if matrices dimension mismatch.
     def +(matrix)
-      sum_validation(matrix, self)
-      values = self.zip(matrix).map{|i| i.inject(:+)}
+      sum_validation(self, matrix)
+      values = self.zip(matrix).map{ |i| i.inject(:+) }
 
       Matrix.new self.m, self.n, *(values)
     end
@@ -62,7 +62,7 @@ require_relative 'matrix_gem/properties_module'
     # Return the difference of two matrices in new matrix.
     # Raises an error if matrices dimension mismatch.
     def -(matrix)
-      sum_validation(matrix, self)
+      sum_validation(self, matrix)
       values = self.zip(matrix).map{|i| i.inject(:-)}
 
       Matrix.new self.m, self.n, *(values)
@@ -79,7 +79,7 @@ require_relative 'matrix_gem/properties_module'
         multiply_validation self, matrix
         rows = Array.new(self.m) { |i|
           Array.new(matrix.n) { |j|
-            (0 ... matrix.n ).inject(0)  do |vij, k|
+            (0 ... self.n).inject(0) do |vij, k|
               vij + self[i, k] * matrix[k, j]
             end
           }
@@ -153,8 +153,12 @@ require_relative 'matrix_gem/properties_module'
 
     # Returns true if and only if the two matrices contain equal elements.
     def ==(matrix)
-      raise ErrDimensionMismatch if (self.m != matrix.m || self.n != matrix.n)
-      matrix.to_f.to_a == self.to_f.to_a
+      (0..self.m-1).each do |i|
+        (0..self.n-1).each do |j|
+          return false if self[i][j] != matrix[i][j]
+        end
+      end
+      true
     end
 
     # Returns the determinant of the matrix.
@@ -195,11 +199,6 @@ require_relative 'matrix_gem/properties_module'
       det.round
     end
     alias determinant det
-
-    # Multiplication of matrix row with number.
-    def multiply_row(matrix, index, number)
-      matrix = matrix.row(index).map{ |n| n*number }
-    end
 
     # Returns new matrix witch is the inverse of the matrix.
     def inversed
@@ -300,7 +299,7 @@ require_relative 'matrix_gem/properties_module'
 
     # Check if matrices have same dimensions.
     def sum_validation(_this, matrix)
-      raise ErrOperationNotDefine if matrix.is_a? Numeric
+      raise ErrOperationNotDefine if !matrix.is_a? Matrix
       raise ErrDimensionMismatch if matrix.m != _this.m || matrix.n != _this.n
     end
 
@@ -320,45 +319,53 @@ require_relative 'matrix_gem/properties_module'
       return id_matrix
     end
 
+    # Multiplication of matrix row with number.
+    def multiply_row(matrix, index, number)
+      matrix = matrix.row(index).map{ |n| n * number }
+    end
+
     # Format values.
     def matrix_with_values(values, col_length)
       matrixNums = values.each_slice(col_length).to_a
     end
 
   end
+
+
 require_relative 'matrix_gem/diagonal_matrix'
 require_relative 'matrix_gem/orthogonal_matrix'
-
+#
     # square_matrix = Matrix.new 3,3,1,2,57,1,3,4,5,6,70
     # a = Matrix.new 2,3,1,2,3,6,5,4
     # # p a.column(2)
     # # p square_matrix.column(0)
-    # square_matrix.set_col 1, [200,300,100]
+    # square_matrix.set_row 1, [200,300,100]
     # p square_matrix
 
 
 
 # p d
-   # a = Matrix.new 3,2,1,2,3,3,2,3
-    b = Matrix.new 2,2,1,1,2,1
-    # b[1,1] = 555
-    # p b
+
+      # p b
 
    #  p a/b
    #  diff = Matrix.new 3,2,3,-1,3,0,4,-1
    #  scalar_diff = Matrix.new 2,2,0.5,0.5,1,0.5
     # non_square_matrix = Matrix.new 3,2,1,2,3,3,2,3
+    # square_matrix = Matrix.new 3,3,1,2,57,1,3,43,5,6,70
+    # p non_square_matrix == square_matrix
     # non_square_matrix.to_str
     # c.to_str
     # p c.inverse
 
+    a = Matrix.new 3,3,0,1,1,1,0,0,1,0,0
+    b = a
+
 # d = Matrix.new 3,2,1,2,3,3,2,3
+# c = Matrix.new 2,3,4,3,4,3,4,3
+# p d * c
 
-# da = a - d
-# p da
 
-# p d.diagonal_values
-# p c == d
 
 
 
