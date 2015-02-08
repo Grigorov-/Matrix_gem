@@ -337,51 +337,6 @@ require_relative 'matrix_gem/properties_module'
 
 require_relative 'matrix_gem/diagonal_matrix'
 require_relative 'matrix_gem/orthogonal_matrix'
-#
-    # square_matrix = Matrix.new 3,3,1,2,57,1,3,4,5,6,70
-    # a = Matrix.new 2,3,1,2,3,6,5,4
-    # # p a.column(2)
-    # # p square_matrix.column(0)
-    # square_matrix.set_row 1, [200,300,100]
-    # p square_matrix
-
-
-
-# p d
-
-      # p b
-    c = Matrix.new 3,3,0,1,1,1,0,0,1,0,0
-
-   #  p a/b
-   #  diff = Matrix.new 3,2,3,-1,3,0,4,-1
-   #  scalar_diff = Matrix.new 2,2,0.5,0.5,1,0.5
-    # non_square_matrix = Matrix.new 3,2,1,2,3,3,2,3
-    # square_matrix = Matrix.new 3,3,1,2,57,1,3,43,5,6,70
-    # p non_square_matrix == square_matrix
-    # non_square_matrix.to_str
-    c.to_str
-    # p c.inverse
-
-
-
-# d = Matrix.new 3,2,1,2,3,3,2,3
-# c = Matrix.new 2,3,4,3,4,3,4,3
-# p d * c
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

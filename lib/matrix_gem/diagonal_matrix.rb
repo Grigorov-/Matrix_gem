@@ -107,13 +107,3 @@ require_relative  '../matrix_gem'
     end
   end
 
-   # id_matrix = Diagonal_Matrix.diagonal(1.0,1,1)
-    square_matrix = Diagonal_Matrix.new 3,3,1,3,5
-    a = Diagonal_Matrix.new 3,2,3,4
-    diff = Matrix.new 2,3,1,2,3,4,5,6
-    d = Diagonal_Matrix.new 3,2,1,2
-    # p d / square_matrix
-    non_square_matrix = Diagonal_Matrix.new 3,2,1,12
-
-
-
