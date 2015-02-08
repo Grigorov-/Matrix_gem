@@ -22,7 +22,7 @@ require_relative  '../matrix_gem'
       if b.orthogonal?
         @matrix[i][j] = value
       else
-        raise MatrixInvalidValue, 'The matrix must be orthogonal.'
+        raise MatrixIndexOutOfRange, 'The matrix must be orthogonal.'
       end
     end
   end

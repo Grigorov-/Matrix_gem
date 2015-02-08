@@ -28,26 +28,29 @@ require_relative 'matrix_gem/properties_module'
       @matrix
     end
 
-    # Creates an n by n zero matrix.
-    def self.zero(n)
-      values = Array.new(n*n, 0)
-      matrix = Matrix.new n, n, *(values)
-    end
+    class << self
 
-    # Creates a matrix where the diagonal elements are composed of values.
-    def self.diagonal(*nums)
-      size = nums.size
-      matrix = Matrix.new size, size
-
-      size.times do |x|
-        matrix[x][x] = nums[x]
+      # Creates an n by n zero matrix.
+      def zero(n)
+        values = Array.new(n*n, 0)
+        matrix = Matrix.new n, n, *(values)
       end
-      matrix
-    end
 
-    # Creates an n by n identity matrix.
-    def self.identity(n)
-      Matrix.new n, n
+      # Creates a matrix where the diagonal elements are composed of values.
+      def diagonal(*nums)
+        size = nums.size
+        matrix = Matrix.new size, size
+
+        size.times do |x|
+          matrix[x][x] = nums[x]
+        end
+        matrix
+      end
+
+      # Creates an n by n identity matrix.
+      def identity(n)
+        Matrix.new n, n
+      end
     end
 
     # Return the sum of two matrices in new matrix
@@ -347,6 +350,7 @@ require_relative 'matrix_gem/orthogonal_matrix'
 # p d
 
       # p b
+    c = Matrix.new 3,3,0,1,1,1,0,0,1,0,0
 
    #  p a/b
    #  diff = Matrix.new 3,2,3,-1,3,0,4,-1
@@ -355,11 +359,10 @@ require_relative 'matrix_gem/orthogonal_matrix'
     # square_matrix = Matrix.new 3,3,1,2,57,1,3,43,5,6,70
     # p non_square_matrix == square_matrix
     # non_square_matrix.to_str
-    # c.to_str
+    c.to_str
     # p c.inverse
 
-    a = Matrix.new 3,3,0,1,1,1,0,0,1,0,0
-    b = a
+
 
 # d = Matrix.new 3,2,1,2,3,3,2,3
 # c = Matrix.new 2,3,4,3,4,3,4,3

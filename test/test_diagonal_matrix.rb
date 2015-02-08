@@ -27,6 +27,13 @@ class Diagonal_Matrix_Test < Minitest::Test
     assert_instance_of Diagonal_Matrix, Diagonal_Matrix.identity(4)
   end
 
+  def test_change_matrix_element
+    @id_matrix[1,1] = 2
+    changed = @id_matrix
+    assert_equal Diagonal_Matrix.diagonal(1,2,1), changed
+    assert_raises(MatrixIndexOutOfRange){ @id_matrix[1,2] = 4 }
+  end
+
   def test_sum_with_different_type_matrices
     sum = Diagonal_Matrix.diagonal(2, 5, 33)
     assert_equal sum, @id_matrix + Matrix.new(3,3,1,3,4,2,4,22,13,2,32)

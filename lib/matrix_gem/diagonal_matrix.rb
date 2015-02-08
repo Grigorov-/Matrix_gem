@@ -25,30 +25,32 @@ require_relative  '../matrix_gem'
       end
     end
 
-    # Creates a matrix where the diagonal elements are composed of nums.
-    def self.diagonal(*nums)
-      size = nums.length
-      Diagonal_Matrix.new size, size, *(nums)
-    end
+    class << self
+      # Creates a matrix where the diagonal elements are composed of nums.
+      def diagonal(*nums)
+        size = nums.length
+        Diagonal_Matrix.new size, size, *(nums)
+      end
 
-    # Creates a zero matrix with dimension equal to n.
-    def self.zero(n)
-      Diagonal_Matrix.diagonal(*(Array.new(n, 0)))
-    end
+      # Creates a zero matrix with dimension equal to n.
+      def zero(n)
+        Diagonal_Matrix.diagonal(*(Array.new(n, 0)))
+      end
 
-    def self.identity(n)
-      Diagonal_Matrix.new n
+      def identity(n)
+        Diagonal_Matrix.new n
+      end
     end
 
     # Set element on main diagonal
-    def []=(row_index, col_index = nil, value)
-      if col_index != nil && row_index != col_index
+    def []=(i, j = nil, value)
+      if j != nil && i != j
         raise MatrixIndexOutOfRange,
         "You can set only elements on main diagonal in a diagonal matrix."
-      elsif @matrix.size <= row_index
+      elsif @matrix.size <= i
         raise MatrixIndexOutOfRange
       end
-        @matrix[row_index][row_index] = value
+        @matrix[i][i] = value
     end
 
     # Sum values on main diagonal of two matrices.
