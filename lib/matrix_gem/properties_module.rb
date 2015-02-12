@@ -1,5 +1,4 @@
 module Properties
-  require_relative 'matrix_err.rb'
 
   include MatrixErr
 

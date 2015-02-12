@@ -1,4 +1,4 @@
-require_relative  '../matrix_gem'
+
 
   class Diagonal_Matrix < Matrix
 

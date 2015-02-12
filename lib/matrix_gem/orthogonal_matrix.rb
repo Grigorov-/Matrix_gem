@@ -1,5 +1,3 @@
-require_relative  '../matrix_gem'
-
   class Orthogonal_Matrix < Matrix
 
   # Initialize orthogonal matrix (square matrix and its transpose is equal to its inverse).
