@@ -68,6 +68,15 @@ class Matrix_GemTest < Minitest::Test
     assert_equal matr_product, @square_matrix * b
   end
 
+  def test_matrix_on_power
+    assert_equal Matrix.new(3,3,6,12,18,6,12,18,6,12,18), Matrix.new(3,3,1,2,3,1,2,3,1,2,3)**2
+  end
+
+  def test_minor_method
+    assert_equal Matrix.new(2,3,1,2,57,1,3,43), @square_matrix.minor(0..1, 0..2)
+    assert_nil @square_matrix.minor(0..1, -223..2)
+  end
+
   def test_multiplication_with_dimension_mismatch_matrices
     assert_raises(ErrDimensionMismatch){ @non_square_matrix * @square_matrix }
   end
@@ -122,6 +131,10 @@ class Matrix_GemTest < Minitest::Test
 
   def test_diagonal_values
     assert_equal [1,1,1], @id_matrix.diagonal_values
+  end
+
+  def test_to_set_diagonal_values
+    assert_equal Matrix.new(3,2,11,2,3,11,2,3), @non_square_matrix.set_diagonal(11,11)
   end
 
   def test_col_length

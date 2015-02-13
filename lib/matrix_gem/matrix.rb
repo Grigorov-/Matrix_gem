@@ -268,6 +268,40 @@
       puts a
     end
 
+    # Matrix exponentiation. Equivalent to multiplying the matrix by itself N times.
+    def **(n)
+      raise MatrixArgumentError if !(n.is_a? Integer)
+      matrix = Matrix.identity(self.m)
+      n.times { |_| matrix *= self } if self.square?
+      matrix
+    end
+
+    # Returns a section of the matrix. The parameters are:
+    # row_range, col_range
+    def minor(*param)
+      row_range, col_range = param
+
+      from_row = row_range.first
+      form_row += self.m if from_row < 0
+      to_row = row_range.end
+      to_row += self.m if to_row < 0
+      to_row += 1 unless row_range.exclude_end?
+      size_row = to_row - from_row
+
+      from_col = col_range.first
+      from_col += self.n if from_col < 0
+      to_col = col_range.end
+      to_col += self.n if from_col < 0
+      to_col += 1 unless col_range.exclude_end?
+      size_col = to_col - from_col
+      return nil if from_row > row_count || from_col > column_count ||
+        from_row < 0 || from_col < 0
+        rows = @matrix[from_row, size_row].collect{ |row| row[from_col, size_col] }
+        values = []
+        rows.each{ |row| row.each {|val| values << val } }
+        Matrix.new [self.m - from_row, size_row].min, [self.n - from_col, size_col].min, *(values)
+    end
+
     private
 
     # Swap to matrix rows.

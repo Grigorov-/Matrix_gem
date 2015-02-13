@@ -26,7 +26,6 @@ module Properties
     values
   end
 
-  # TODO Test it!!
   # Set values on main diagonal.
   # Raise error if nums are less than matrix main diagonal length
   # Also aliased as set_diagonal_values
