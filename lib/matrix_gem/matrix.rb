@@ -30,18 +30,23 @@
       # Creates an n by n zero matrix.
       def zero(n)
         values = Array.new(n*n, 0)
-        matrix = Matrix.new n, n, *(values)
+        Matrix.new n, n, *(values)
       end
 
       # Creates a matrix where the diagonal elements are composed of values.
       def diagonal(*nums)
-        size = nums.size
-        matrix = Matrix.new size, size
-
-        size.times do |x|
-          matrix[x][x] = nums[x]
-        end
-        matrix
+        raise ArgumentError, "Matrix values can't be nil" if nums.include? nil
+        size = nums.length
+        matrix_values = []
+        Array.new(size) { |i| Array.new(size) do |j|
+          if i == j
+            matrix_values << nums[i]
+          else
+            matrix_values << 0
+          end
+       end
+          }
+        Matrix.new(size, size, *(matrix_values))
       end
 
       # Creates an n by n identity matrix.

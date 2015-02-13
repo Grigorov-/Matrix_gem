@@ -17,16 +17,20 @@ class Matrix_GemTest < Minitest::Test
     assert_instance_of Matrix, @non_square_matrix, 'Non square matrix'
   end
 
-  def test_create_matrix_errors
+  def test_create_matrix_with_wrong_values
     assert_raises(MatrixArgumentError){ Matrix.new 0,1,2 }
     assert_raises(MatrixArgumentError){ Matrix.new 3,2,1,2,3 }
     assert_raises(MatrixArgumentError){ Matrix.new 2.2,2,2,1,3,4 }
+    assert_raises(ArgumentError){ Matrix.new }
+    assert_raises(MatrixArgumentError) { Matrix.new 2.3,2,1,2,3,4 }
   end
 
-  # TODO Test output
-  # def test_matrix_output
-  #   assert_output("Matrix\n[1 2],\n[3 3],\n[2 3]"){ @non_square_matrix.to_str }
-  # end
+  def test_create_matrix_with_nil_values
+    assert_raises(NoMethodError){ Matrix.new 2,nil }
+    assert_raises(ArgumentError){ Matrix.diagonal nil,2,3 }
+    assert_raises(NoMethodError){ Matrix.zero  nil }
+    assert_raises(NoMethodError){ Matrix.identity(nil) }
+  end
 
   def test_create_zero_matrix
     assert_equal true, Matrix.zero(3).zero?
