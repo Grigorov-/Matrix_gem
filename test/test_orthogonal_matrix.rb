@@ -1,6 +1,4 @@
-require 'minitest/autorun'
-require_relative '../lib/matrix_gem/matrix_err.rb'
-require 'matrix_gem'
+require_relative './test_helper'
 
 class Orthogonal_Matrix_GemTest < Minitest::Test
   include MatrixErr

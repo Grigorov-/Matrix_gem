@@ -57,7 +57,6 @@ module Properties
   alias row_size row_length
   alias row_count m
 
-
   alias n col_length
   alias col_size col_length
   alias column_count n

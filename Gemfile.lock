@@ -1,11 +1,7 @@
 PATH
   remote: .
   specs:
-<<<<<<< HEAD
     matrix_gem (0.2.3)
-=======
-    matrix_gem (0.1.0)
->>>>>>> 04fac2ac30078c34289c819de09a204166178008
 
 GEM
   remote: https://rubygems.org/
@@ -17,11 +13,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-<<<<<<< HEAD
   bundler (~> 1.7)
-=======
-  bundler
->>>>>>> 04fac2ac30078c34289c819de09a204166178008
   matrix_gem!
   minitest
   rake
