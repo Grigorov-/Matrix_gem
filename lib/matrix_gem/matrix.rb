@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 module Mat
-=======
->>>>>>> 04fac2ac30078c34289c819de09a204166178008
   class Matrix
     include MatrixErr
     include Properties
@@ -9,19 +6,11 @@ module Mat
 
     #---------Initialize the matrix--------
     #  1. Matrix with values
-<<<<<<< HEAD
     #     Mat::Matrix.new(rows, cols, numbers) // numbers = rows*cols
     #  2. Matrix only with dimension(rows and cols) make Identity matrix with dimension
     #     equal to rows
     #     Mat::Matrix.new(rows, cols)
     def initialize(rows, cols = rows, *nums)
-=======
-    #     Matrix.new(rows, cols, numbers) // numbers = rows*cols
-    #  2. Matrix only with dimension(rows and cols) make Identity matrix with dimension
-    #     equal to rows
-    #     Matrix.new(rows, cols)
-    def initialize(rows, cols, *nums)
->>>>>>> 04fac2ac30078c34289c819de09a204166178008
       if rows < 1 || cols < 1
         raise MatrixArgumentError, "Rows and Columns should be positive numbers!"
       elsif ((cols.is_a? Float) || (rows.is_a? Float))
@@ -270,15 +259,11 @@ module Mat
       self
     end
 
-<<<<<<< HEAD
     # Print matrix on console in format Matrix
                                       # [.....],
                                       #  .....
                                       #  .....
                                       # [.....]
-=======
-    # To stirng method.
->>>>>>> 04fac2ac30078c34289c819de09a204166178008
     def to_str
       a = "Matrix\n" + @matrix.map do |row|
         "[" + row.map do |e|
@@ -387,12 +372,6 @@ module Mat
     def matrix_with_values(values, col_length)
       matrixNums = values.each_slice(col_length).to_a
     end
-<<<<<<< HEAD
   end
 end
-=======
-
-  end
-
->>>>>>> 04fac2ac30078c34289c819de09a204166178008
 

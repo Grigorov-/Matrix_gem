@@ -7,11 +7,7 @@ module Properties
     self
   end
 
-<<<<<<< HEAD
   # Change all values floating point.
-=======
-  # Make all values floating point.
->>>>>>> 04fac2ac30078c34289c819de09a204166178008
   def to_f
     (0..self.n - 1).each{ |i| (0..self.m - 1).each do
       |j| self[i,j] = self[i,j].to_f
@@ -75,13 +71,9 @@ module Properties
   # Also aliased as column()
   def col(index)
     column = []
-<<<<<<< HEAD
     (0..self.m-1).each do |x| 
       column << self[x, index] 
     end
-=======
-    (0..self.m-1).each{ |x| column << self[x, index] }
->>>>>>> 04fac2ac30078c34289c819de09a204166178008
     column
   end
   alias column col
@@ -99,13 +91,9 @@ module Properties
   # Raise error if length of elements is not equal to matrix column length.
   def set_col(index, elements)
     raise MatrixArgumentError, 'Different length of elements and column length' if elements.length != self.col_length
-<<<<<<< HEAD
     (0..self.m-1).each do |x| 
       self[x, index] = elements[x] 
     end
-=======
-    (0..self.m-1).each{ |x| self[x, index] = elements[x] }
->>>>>>> 04fac2ac30078c34289c819de09a204166178008
     self
   end
 
